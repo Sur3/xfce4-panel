@@ -70,6 +70,9 @@ GtkArrowType  xfce_arrow_button_get_arrow_type (XfceArrowButton *button);
 void          xfce_arrow_button_set_arrow_type (XfceArrowButton *button,
                                                 GtkArrowType     arrow_type);
 
+gboolean xfce_arrow_button_get_suggested_action(GtkWidget* button);
+void xfce_arrow_button_set_suggested_action(GtkWidget* button, gboolean active);
+
 gboolean      xfce_arrow_button_get_blinking   (XfceArrowButton *button);
 void          xfce_arrow_button_set_blinking   (XfceArrowButton *button,
                                                 gboolean         blinking);

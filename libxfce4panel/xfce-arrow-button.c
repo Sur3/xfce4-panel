@@ -474,16 +474,13 @@ xfce_arrow_button_blinking_timeout (gpointer user_data)
 {
   XfceArrowButton *button = XFCE_ARROW_BUTTON (user_data);
 
-  GtkStateFlags    flags = gtk_widget_get_state_flags (GTK_WIDGET (button));
-
-  if ((flags & GTK_STATE_FLAG_ACTIVE) == GTK_STATE_FLAG_ACTIVE
-    || button->priv->blinking_timeout_id == 0)
+  if (xfce_arrow_button_get_suggested_action(GTK_WIDGET (button)) || button->priv->blinking_timeout_id == 0)
     {
-      gtk_widget_unset_state_flags (GTK_WIDGET (button), GTK_STATE_FLAG_ACTIVE);
+      xfce_arrow_button_set_suggested_action(GTK_WIDGET (button), FALSE);
     }
   else
     {
-      gtk_widget_set_state_flags (GTK_WIDGET (button), GTK_STATE_FLAG_ACTIVE, FALSE);
+      xfce_arrow_button_set_suggested_action(GTK_WIDGET (button), TRUE);
     }
 
   return (button->priv->blinking_counter++ < MAX_BLINKING_COUNT);
@@ -496,7 +493,7 @@ xfce_arrow_button_blinking_timeout_destroyed (gpointer user_data)
 {
   XfceArrowButton *button = XFCE_ARROW_BUTTON (user_data);
 
-  gtk_widget_unset_state_flags (GTK_WIDGET (button), GTK_STATE_FLAG_ACTIVE);
+  xfce_arrow_button_set_suggested_action(GTK_WIDGET (button), FALSE);
 
   button->priv->blinking_timeout_id = 0;
   button->priv->blinking_counter = 0;
@@ -570,7 +567,20 @@ xfce_arrow_button_set_arrow_type (XfceArrowButton *button,
     }
 }
 
+//weather button has suggested action state set
+gboolean xfce_arrow_button_get_suggested_action(GtkWidget* button){
+ GtkStyleContext *context=gtk_widget_get_style_context(GTK_WIDGET(button));
+ return gtk_style_context_has_class(context,GTK_STYLE_CLASS_SUGGESTED_ACTION);
+}
 
+//set suggested action state according to boolean active
+void xfce_arrow_button_set_suggested_action(GtkWidget* button, gboolean active){
+ GtkStyleContext *context=gtk_widget_get_style_context(GTK_WIDGET(button));
+ if(active)
+  gtk_style_context_add_class(context,GTK_STYLE_CLASS_SUGGESTED_ACTION);
+ else
+  gtk_style_context_remove_class(context,GTK_STYLE_CLASS_SUGGESTED_ACTION);
+}
 
 /**
  * xfce_arrow_button_get_blinking:
@@ -599,6 +609,8 @@ xfce_arrow_button_get_blinking (XfceArrowButton *button)
  *             stop the blinking.
  *
  * Make the button blink.
+ * Use is discouraged, as blinking should be implemented via gtk3 css theme,
+ * 		maybe use xfce_arrow_button_set_suggested_action instead.
  *
  * Since: 4.8
  **/
